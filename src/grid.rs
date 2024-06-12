@@ -138,7 +138,7 @@ impl Grid {
             is_solve: false,
         })
     }
-    pub fn calculate(&mut self) -> anyhow::Result<[[char; 9]; 9]> {
+    pub fn calculate(&mut self) -> anyhow::Result<()> {
         for i in 0..9 {
             for j in 0..9 {
                 if self.data[i][j].is_none() {
@@ -148,13 +148,7 @@ impl Grid {
         }
         self.solve(0);
         if self.is_solve {
-            let mut ans: [[char; 9]; 9] = [['0' as char; 9]; 9];
-            for i in 0..9 {
-                for j in 0..9 {
-                    ans[i][j] = self.data[i][j].unwrap() as char;
-                }
-            }
-            return Ok(ans);
+            return Ok(());
         }
         anyhow::bail!("Solve not found")
     }
@@ -185,8 +179,8 @@ impl Grid {
                     arr[(value - b'1') as usize] += 1;
                 }
             }
-            for j in 0..9 {
-                if arr[j] > 1 {
+            for item in &arr {
+                if *item > 1 {
                     return false;
                 }
             }
@@ -198,8 +192,8 @@ impl Grid {
                     arr[(value - b'1') as usize] += 1;
                 }
             }
-            for i in 0..9 {
-                if arr[i] > 1 {
+            for item in &arr {
+                if *item > 1 {
                     return false;
                 }
             }
@@ -211,12 +205,27 @@ impl Grid {
                     arr[(value - b'1') as usize] += 1;
                 }
             }
-            for i in 0..9 {
-                if arr[i] > 1 {
+            for item in &arr {
+                if *item > 1 {
                     return false;
                 }
             }
         }
         true
+    }
+}
+impl std::fmt::Display for Grid {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for i in 0..9 {
+            for j in 0..9 {
+                if j == 2 || j == 5 {
+                    write!(f, "{} | ", self.data[i][j].unwrap_or(b'x') as char)?;
+                } else {
+                    write!(f, "{} ", self.data[i][j].unwrap_or(b'x') as char)?;
+                }
+            }
+            writeln!(f, "\n---------------------")?;
+        }
+        Ok(())
     }
 }
